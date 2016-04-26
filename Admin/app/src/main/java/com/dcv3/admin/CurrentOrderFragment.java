@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 
@@ -17,8 +19,12 @@ import com.parse.ParseQueryAdapter;
  */
 public class CurrentOrderFragment extends Fragment {
     ListView listView;
+    boolean clicked = false;
     ParseQueryAdapter<ParseObject> mainAdapter;
     String restId;
+    String orderId;
+    Button deleteButton;
+    ParseObject obj;
 
     public CurrentOrderFragment(){
 
@@ -28,9 +34,7 @@ public class CurrentOrderFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.currentorder_fragment, container, false);
-        //restId =getArguments().getString("id");
-
-
+        deleteButton = (Button) v.findViewById(R.id.deleteButton);
         // Initialize main ParseQueryAdapter
         mainAdapter = new ParseQueryAdapter<ParseObject>(getActivity(), new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery<ParseObject> create() {
@@ -50,7 +54,21 @@ public class CurrentOrderFragment extends Fragment {
         listView.setAdapter(mainAdapter);
         mainAdapter.loadObjects();
 
-        //Toast.makeText(getActivity(), restId, Toast.LENGTH_LONG).show();
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                clicked = true;
+                //Getting the name of each item selected
+                obj = mainAdapter.getItem(position);
+            }
+        });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View popupView) {
+                obj.deleteInBackground();
+            }
+        });
+
         return v;
     }
 }
